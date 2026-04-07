@@ -1,3 +1,5 @@
+using AspNetCoreWebApiTemplate.Api.Extensions;
+
 using Scalar.AspNetCore;
 
 using Serilog;
@@ -30,7 +32,7 @@ try
 
     app.UseHttpsRedirection();
 
-    app.MapGet("/", () => "Hello, World!");
+    app.MapEndpoints();
 
     app.Run();
 
