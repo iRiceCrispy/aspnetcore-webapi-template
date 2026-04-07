@@ -1,16 +1,43 @@
-var builder = WebApplication.CreateBuilder(args);
+using Serilog;
 
-builder.Services.AddOpenApi();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-var app = builder.Build();
+Log.Information("Application starting...");
 
-if (app.Environment.IsDevelopment())
+try
 {
-    app.MapOpenApi();
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddSerilog((services, lc) => lc
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services));
+
+    builder.Services.AddOpenApi();
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.MapGet("/", () => "Hello, World!");
+
+    app.Run();
+
+    Log.Information("Application shut down.");
 }
-
-app.UseHttpsRedirection();
-
-app.MapGet("/", () => "Hello, World!");
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly\n");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
