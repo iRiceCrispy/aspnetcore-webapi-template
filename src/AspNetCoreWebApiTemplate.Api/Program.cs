@@ -1,3 +1,5 @@
+using Scalar.AspNetCore;
+
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -23,6 +25,7 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.MapOpenApi();
+        app.MapScalarApiReference();
     }
 
     app.UseHttpsRedirection();
